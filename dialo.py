@@ -2,12 +2,12 @@ import json
 import requests
 import os
 
+def tok(i):
+    return "TOK"+str(i%9)
+
 c_token = 50
 API_URL = "https://api-inference.huggingface.co/models/microsoft/DialoGPT-large"
 headers = {"Authorization": os.environ[tok(c_token)]}
-
-def tok(i):
-    return "TOK"+str(i%9)
 
 def query(payload):
 	data = json.dumps(payload)
