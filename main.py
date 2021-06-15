@@ -22,7 +22,7 @@ def get_msg(message):
 async def on_message(message):
     global cric_on, match
     #dont care
-    if message.author == client.user or message.startswith('-'):
+    if message.author == client.user or message.content.startswith('-'):
         return
     #hand cricket functions
     if message.content.lower().startswith('hp cricket') or cric_on:
