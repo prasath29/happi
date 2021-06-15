@@ -19,6 +19,12 @@ record = {}
 def reply(msg, message):
     global record, c_token
     user = message.author.id
+    #clearing chat hostory
+    if msg == '-clear' or '-clr':
+        if user in record:
+            record.pop(user)
+        return 'Your chat history cleared.'
+    #adding new user in dictionry to maintain chat history
     if not (user in record):
         record[user]={'ip':[], 'op':[]}
     data = query(
@@ -30,6 +36,7 @@ def reply(msg, message):
             }
         }
     )
+    #using multiple tokens to bypass api limitaions
     if 'error' in data:
         c_token -= 1
         if c_token<0:
@@ -37,6 +44,8 @@ def reply(msg, message):
         headers['Authorization'] = os.environ[tok(c_token)]
         return reply(msg, message)
     ans = data['generated_text']
+    #dialo sometimes repeat the same thing again and again
+    #so cleating the chat history and getting new reply if msg repeats
     if any(ans in rep for rep in record[user]['op']):
         record.pop(user)
         return reply(msg, message)

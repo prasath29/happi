@@ -60,6 +60,6 @@ def reply(msg, message, dat):
                     return pr[i]
                 else:
                     return 'Break'
-    #dialoga gpt replies
+    #dialo gpt reply
     else:
         return dialo.reply(msg, message)

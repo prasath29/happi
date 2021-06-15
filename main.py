@@ -5,16 +5,26 @@ import reply
 import cricket
 from keep_alive import keep_alive
 
-client = discord.Client()
+client = discord.Client(description='hp help')
 
 cric_on = False
 match = 0
 
+def get_msg(message):
+    msg = message.content.lower()
+    msg = [wr for wr in msg.split(' ') if wr!='']
+    if msg[0]=='hp':
+        msg.pop(0)
+    msg = ' '.join(msg)
+    return msg
+
 @client.event
 async def on_message(message):
     global cric_on, match
-    if message.author == client.user:
+    #dont care
+    if message.author == client.user or message.startswith('-'):
         return
+    #hand cricket functions
     if message.content.lower().startswith('hp cricket') or cric_on:
         if message.content.lower().startswith('hp cricket') and cric_on:
             await message.channel.send('Already game is going on\nPlease wait untill the game is over.')
@@ -30,15 +40,16 @@ async def on_message(message):
                 user = await client.fetch_user(player.id)
                 await user.send('hello man!')
                 print('opssss')
-    elif message.content.lower().startswith('hp') or str(message.channel).startswith('Direct'):
-        msg = message.content.lower()
-        msg = [wr for wr in msg.split(' ') if wr!='']
-        if msg[0]=='hp':
-            msg.pop(0)
-        msg = ' '.join(msg)
+    #hp basic reply
+    elif message.content.lower().startswith('hp') or str(message.channel).startswith('Direct') or str(message.channel)=='hp-here':
+        msg = get_msg(message)
         t = message.created_at + datetime.timedelta(hours=5, minutes=30)
         print(message.channel)
         await message.channel.send(reply.reply(msg, message, t))
+    #vote function
+    elif message.contect.lower().startswith('vote'):
+        await message.add_reaction(':thumbsup:')
+        await message.add_reaction(':thumbsdown:')
 
 keep_alive()
 client.run(os.environ['TOKEN'])
