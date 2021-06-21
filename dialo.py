@@ -20,7 +20,7 @@ def reply(msg, message):
     global record, c_token
     user = message.author.id
     #clearing chat hostory
-    if msg == '-clear' or '-clr':
+    if msg == '-clear':
         if user in record:
             record.pop(user)
         return 'Your chat history cleared.'
