@@ -1,6 +1,9 @@
 import json
 import requests
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def tok(i):
     return "TOK"+str(i%9)

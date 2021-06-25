@@ -3,12 +3,13 @@ import os
 import datetime
 import reply
 import cricket
-from keep_alive import keep_alive
+from dotenv import load_dotenv
 
-client = discord.Client(description='hp help')
+load_dotenv()
 
-cric_on = False
-match = 0
+client = discord.Client()
+
+match = cricket.cric(0)
 
 def get_msg(message):
     msg = message.content.lower()
@@ -25,21 +26,33 @@ async def on_message(message):
     if message.author == client.user or message.content.startswith('-'):
         return
     #hand cricket functions
-    if message.content.lower().startswith('hp cricket') or cric_on:
-        if message.content.lower().startswith('hp cricket') and cric_on:
+    if message.content.lower().startswith('hp cricket') or match.cric_on:
+        if message.content.lower().startswith('hp cricket') and match.cric_on:
             await message.channel.send('Already game is going on\nPlease wait untill the game is over.')
         elif message.content.lower().startswith('hp cricket'):
             match = cricket.cric(message)
-            if match.check():
-                cric_on = True
-                await message.channel.send(match.ready())
-            else:
-                await message.channel.send('Same player cant play in two teams\nAlso bot name cant be mentioned!')
+            await match.channel.send(match.check())
         if message.content.lower()=='send':
             for player in match.players:    
                 user = await client.fetch_user(player.id)
                 await user.send('hello man!')
                 print('opssss')
+    #hp exam focus comments
+    elif message.content.lower().startswith('hp focus') and str(message.channel)=='lobby':
+        msg = get_msg(message)[6:]
+        member = message.author
+        if msg=='none':
+            for i in range(10):
+                var = discord.utils.get(message.guild.roles, name = str(i))
+                await member.remove_roles(var)
+        elif msg=='all':
+            for i in range(10):
+                var = discord.utils.get(message.guild.roles, name = str(i))
+                await member.add_roles(var)
+        else:
+            var = discord.utils.get(message.guild.roles, name = msg)
+            await member.add_roles(var)
+        await message.add_reaction('\N{THUMBS UP SIGN}')
     #hp basic reply
     elif message.content.lower().startswith('hp') or str(message.channel).startswith('Direct') or str(message.channel)=='hp-here':
         msg = get_msg(message)
@@ -48,8 +61,7 @@ async def on_message(message):
         await message.channel.send(reply.reply(msg, message, t))
     #vote function
     elif message.contect.lower().startswith('vote'):
-        await message.add_reaction(':thumbsup:')
-        await message.add_reaction(':thumbsdown:')
+        await message.add_reaction('\N{THUMBS UP SIGN}')
+        await message.add_reaction('\N{THUMBS DOWN SIGN}')
 
-keep_alive()
 client.run(os.environ['TOKEN'])

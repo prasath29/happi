@@ -1,0 +1,6 @@
+# requirements
+
+discord
+python-dotenv
+json
+requests
