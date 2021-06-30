@@ -19,7 +19,7 @@ def reply(msg, message, dat):
         if len(msg)>1:
             di = {'mon':0, 'tue':1, 'wed':2, 'thu':3, 'fri':4, 'sat':5, 'sun':6, 'tmr':day+1, 'yst':day-1}
             if msg[1] in di:
-                return tt[di[msg[1]]]
+                return tt[di[msg[1]]%7]
             else:
                 return 'Invalid request\nTry \'hp tt mon\''
         else:
@@ -63,3 +63,4 @@ def reply(msg, message, dat):
     #dialo gpt reply
     else:
         return dialo.reply(msg, message)
+     
