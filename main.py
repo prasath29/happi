@@ -32,11 +32,31 @@ async def on_message(message):
         elif message.content.lower().startswith('hp cricket'):
             match = cricket.cric(message)
             await match.channel.send(match.check())
-        if message.content.lower()=='send':
-            for player in match.players:    
-                user = await client.fetch_user(player.id)
-                await user.send('hello man!')
-                print('opssss')
+        elif message.content.lower().startswith('hp start'):
+            author = message.author
+            if author in match.players and author not in match.start_lis:
+                await match.channel.send(match.start(author))
+                if len(match.players)==len(match.start_lis):
+                    thing = match.begin()
+                    for player in match.players:    
+                        user = await client.fetch_user(player.id)
+                        await user.send(thing)
+        elif str(message.channel).startswith('Direct') and message.author in match.players:
+            try:
+                sign = int(message.content)
+                if 0<sign<7:
+                    thing = match.play(sign, message)
+                    if match.status=='played':
+                        for player in match.players:    
+                            user = await client.fetch_user(player.id)
+                            await user.send(thing)
+                    else:
+                        await message.channel.send('waiting for other player')
+                else:
+                    await message.channel.send('Enter a number form 1 to 6')
+            except ValueError:
+                await message.channel.send('Enter a number')
+
     #hp exam focus comments
     elif message.content.lower().startswith('hp focus') and str(message.channel)=='lobby':
         msg = get_msg(message)[6:]
