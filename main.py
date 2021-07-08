@@ -38,24 +38,51 @@ async def on_message(message):
                 await match.channel.send(match.start(author))
                 if len(match.players)==len(match.start_lis):
                     thing = match.begin()
+                    match.msg_lis = {}
+                    embed = discord.Embed(title=thing['title'], description=thing['description'], color=thing['color'])
+                    embed.set_footer(text=thing['footer']['text'])
                     for player in match.players:    
                         user = await client.fetch_user(player.id)
-                        await user.send(thing)
+                        msg = await user.send(embed=embed)
+                        match.msg_lis[player.id]=msg
         elif str(message.channel).startswith('Direct') and message.author in match.players:
             try:
                 sign = int(message.content)
                 if 0<sign<7:
                     thing = match.play(sign, message)
                     if match.status=='played':
-                        for player in match.players:    
-                            user = await client.fetch_user(player.id)
-                            await user.send(thing)
+                        embed = discord.Embed(title=thing['title'], description=thing['description'], color=thing['color'])
+                        embed.set_footer(text=thing['footer']['text'])
+                        for playerid in list(match.msg_lis.keys()):
+                            user = await client.fetch_user(playerid)
+                            await match.msg_lis[playerid].delete()
+                            msg = await user.send(embed=embed)
+                            match.msg_lis[playerid] = msg
+                        if not match.cric_on:
+                            thing = match.end()
+                            embed = discord.Embed(title=thing['title'], description=thing['description'], color=thing['color'])
+                            await match.channel.send(embed=embed)
                     else:
-                        await message.channel.send('waiting for other player')
+                        thing = match.sync_embed(cus_msg='waiting for other player')
+                        embed = discord.Embed(title=thing['title'], description=thing['description'], color=thing['color'])
+                        embed.set_footer(text=thing['footer']['text'])
+                        await match.msg_lis[message.author.id].delete()
+                        msg = await message.channel.send(embed=embed)
+                        match.msg_lis[message.author.id] = msg
                 else:
-                    await message.channel.send('Enter a number form 1 to 6')
+                    thing = match.sync_embed(cus_msg='Enter a number form 1 to 6')
+                    embed = discord.Embed(title=thing['title'], description=thing['description'], color=thing['color'])
+                    embed.set_footer(text=thing['footer']['text'])
+                    await match.msg_lis[message.author.id].delete()
+                    msg = await message.channel.send(embed=embed)
+                    match.msg_lis[message.author.id] = msg      
             except ValueError:
-                await message.channel.send('Enter a number')
+                thing = match.sync_embed(cus_msg='Enter a number')
+                embed = discord.Embed(title=thing['title'], description=thing['description'], color=thing['color'])
+                embed.set_footer(text=thing['footer']['text'])
+                await match.msg_lis[message.author.id].delete()
+                msg = await message.channel.send(embed=embed)
+                match.msg_lis[message.author.id] = msg
 
     #hp exam focus comments
     elif message.content.lower().startswith('hp focus') and str(message.channel)=='lobby':
@@ -80,7 +107,7 @@ async def on_message(message):
         print(message.channel)
         await message.channel.send(reply.reply(msg, message, t))
     #vote function
-    elif message.contect.lower().startswith('vote'):
+    elif message.content.lower().startswith('vote'):
         await message.add_reaction('\N{THUMBS UP SIGN}')
         await message.add_reaction('\N{THUMBS DOWN SIGN}')
 
