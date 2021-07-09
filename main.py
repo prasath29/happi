@@ -4,6 +4,7 @@ import datetime
 import reply
 import cricket
 from dotenv import load_dotenv
+from keep_alive import keep_alive
 
 load_dotenv()
 
@@ -111,4 +112,5 @@ async def on_message(message):
         await message.add_reaction('\N{THUMBS UP SIGN}')
         await message.add_reaction('\N{THUMBS DOWN SIGN}')
 
+keep_alive()
 client.run(os.environ['TOKEN'])
