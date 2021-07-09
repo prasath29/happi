@@ -11,6 +11,7 @@ client = discord.Client()
 
 match = cricket.cric(0)
 
+#function to get hp msg
 def get_msg(message):
     msg = message.content.lower()
     msg = [wr for wr in msg.split(' ') if wr!='']
